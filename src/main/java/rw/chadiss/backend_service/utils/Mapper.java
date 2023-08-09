@@ -11,5 +11,4 @@ public class Mapper {
         return modelMapper.map(object, User.class);
     }
 
-
 }

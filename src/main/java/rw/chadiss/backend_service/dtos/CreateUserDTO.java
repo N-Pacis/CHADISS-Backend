@@ -17,21 +17,21 @@ import javax.validation.constraints.Pattern;
 public class CreateUserDTO {
 
     @Email
-    private  String email;
+    private String email;
 
     @NotBlank
-    private  String firstName;
+    private String firstName;
 
     @NotBlank
-    private  String lastName;
+    private String lastName;
 
     @NotBlank
     @Pattern(regexp = "[0-9]{9,10}", message = "Your phone is not a valid tel we expect 07***")
-    private  String mobile;
+    private String mobile;
 
     @Pattern(regexp = "[0-9]{16}")
     private String nationalId;
 
     @ValidPassword
-    private  String password;
+    private String password;
 }

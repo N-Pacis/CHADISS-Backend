@@ -12,7 +12,8 @@ import rw.chadiss.backend_service.models.User;
 import rw.chadiss.backend_service.exceptions.BadRequestException;
 import rw.chadiss.backend_service.exceptions.ResourceNotFoundException;
 import rw.chadiss.backend_service.repositories.IUserRepository;
-import rw.chadiss.backend_service.services.IUserService;
+import rw.chadiss.backend_service.services.*;
+import rw.chadiss.backend_service.utils.Profile;
 
 import java.util.*;
 
@@ -21,9 +22,21 @@ public class UserServiceImpl implements IUserService {
 
     private final IUserRepository userRepository;
 
+    private final ICitizenService citizenService;
+
+    private final IOmbudsmanService ombudsmanService;
+
+    private final IGovernmentAgencyService governmentAgencyService;
+
+    private final IDeputyService deputyService;
+
     @Autowired
-    public UserServiceImpl( IUserRepository userRepository) {
+    public UserServiceImpl(IUserRepository userRepository, ICitizenService citizenService, IOmbudsmanService ombudsmanService, IGovernmentAgencyService governmentAgencyService, IDeputyService deputyService) {
         this.userRepository = userRepository;
+        this.citizenService = citizenService;
+        this.ombudsmanService = ombudsmanService;
+        this.governmentAgencyService = governmentAgencyService;
+        this.deputyService = deputyService;
     }
 
     @Override
@@ -67,5 +80,20 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Page<User> search(EUserStatus status, String name, ERole role, Pageable pageable) {
         return userRepository.search(status,name,role,pageable);
+    }
+
+    @Override
+    public Profile getLoggedInProfile() {
+        User theUser = getLoggedInUser();
+        Object profile;
+        ERole role = theUser.getRole();
+        profile = switch (role) {
+            case CITIZEN -> citizenService.findByUser(theUser);
+            case DEPUTY -> deputyService.findByUser(theUser);
+            case OMBUDSMAN -> ombudsmanService.findByUser(theUser);
+            case GOVERNMENT_AGENCY -> governmentAgencyService.findByUser(theUser);
+            default -> throw new IllegalStateException("Unexpected value: " + role);
+        };
+            return new Profile(profile);
     }
 }
