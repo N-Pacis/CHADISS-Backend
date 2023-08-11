@@ -29,4 +29,9 @@ public class SolutionDocuments {
     @JoinColumn(name = "solution_id")
     @JsonIgnore
     private Solution solution;
+
+    public SolutionDocuments(File file, Solution solution){
+        this.file = file;
+        this.solution = solution;
+    }
 }
